@@ -1,7 +1,7 @@
 .vscode
-*.txt
 *.out
 .venv
 *.cpp
 MILP_Rebennack
 MILP_Kong
+data/
