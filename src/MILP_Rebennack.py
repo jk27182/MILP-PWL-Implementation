@@ -1,10 +1,8 @@
-import time
 import itertools
 
 import gurobipy as gp
 import numpy as np
 
-t = time.perf_counter()
 file = "data/MpStorage50.txt"
 data = np.genfromtxt(file, delimiter="\t")
 
