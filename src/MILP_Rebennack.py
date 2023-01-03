@@ -26,20 +26,12 @@ d_c = np.c_[
     data[:,1] - c_min*data[:,0],
 ]
 d_max = np.max(d_c)
-print(d_max)
 d_min = np.min(d_c)
-print(d_min)
 M_2 = d_max - d_min - data[:,0]*(c_min - c_max)
 M_a_arr = np.c_[
     d_c - d_min,
     d_c - d_max,
 ]
 M_a = np.max(M_a_arr, axis=1)
-file_ma = "Ma.txt"
-file_m2 = "m2.txt"
-M2_test = np.genfromtxt(file_m2, delimiter="\n")
-Ma_test = np.genfromtxt(file_ma, delimiter="\n")
-print(all(M2_test == M_2))
-print(all(Ma_test == M_a))
 # Distance metric
 q = 1
