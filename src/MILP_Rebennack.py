@@ -12,6 +12,9 @@ n_data_points = data.shape[0]
 n_breakpoints = 5
 # Distance metric
 q = 1
+# Distance metric
+# 0=Feasibility, 1=LInf, 2=L1, 3=L2
+objective = 1 
 
 cross_prod = itertools.product(range(n_data_points), repeat=2)
 c_max = -float("inf")
@@ -37,9 +40,10 @@ M_a_arr = np.c_[
 M_a = np.max(M_a_arr, axis=1)
 
 m = gp.Model("MILP_Rebennack")
-c = m.addMvar(n_breakpoints - 1, name="c", lb=c_min, ub=c_max)
+
+c = m.addMVar(n_breakpoints - 1, name="c", lb=c_min, ub=c_max)
 d = m.addMVar(n_breakpoints - 1, name="d", lb=d_min, ub=d_max)
-gamma = np.zeros(n_breakpoints - 2, name="gamma", vtype=gp.GRB.BINARY)
+gamma = m.addMVar(n_breakpoints - 2, name="gamma", vtype=gp.GRB.BINARY)
 delta = m.addMVar(
     (n_data_points, n_breakpoints - 1),
     vtype=gp.GRB.BINARY,
@@ -65,13 +69,35 @@ epsilon = m.addMVar(
 m.addConstr(
     gp.quicksum(
         delta[i,b]
-        for i in range(n_data_points) 
+        for i in range(n_data_points)
         for b in range(n_breakpoints - 1)
     ) == 1
 )
+for i in range(n_data_points - 1):
+    m.addConstr(delta[i+1, 0] <= delta[i, 0])
+    m.addConstr(delta[i+1, n_breakpoints - 2] <= delta[i, n_breakpoints - 2])
+    for b in range(n_breakpoints - 2):
+        m.addConstr(delta[i+1, b+1] <= delta[i, b] + delta[i, b+1])
+        
+        m.addConstr(delta[i, b] + delta[i+1, b+1] + gamma[b] - 2 <= delta_plus[i, b])
+        m.addConstr(delta[i, b] + delta[i+1, b+1] + (1 - gamma[b]) - 2 <= delta_minus[i, b])
+        m.addConstr(d[b+1] - d[b] >= data[i, 0]*(c[b] - c[b+1]) - M_2[i]*(1 - delta_plus[i, b]))
+        m.addConstr(d[b+1] - d[b] <= data[i+1, 0]*(c[b] - c[b+1]) + M_2[i+1]*(1 - delta_plus[i, b]))
+        m.addConstr(d[b+1] - d[b] <= data[i, 0]*(c[b] - c[b+1]) + M_2[i]*(1 - delta_minus[i, b]))
+        m.addConstr(d[b+1] - d[b] >= data[i+1, 0]*(c[b] - c[b+1]) - M_2[i+1]*(1 - delta_minus[i, b]))
 
+if objective == 0:
+    m.setObjective(1)
 
+if objective == 1:
+    for i in range(n_data_points):
+        for b in range(n_breakpoints - 1):
+            m.addConstr(data[i,1] - (c[b]*data[i,0] + d[b]) <= epsilon[0] + M_a[i]*(1 - delta[i,b]))
+            m.addConstr(c[b]*data[i,0] + d[b] - data[i,1] <= epsilon[0] + M_a[i]*(1 - delta[i,b]))
+    m.setObjective(epsilon[0], gp.GRB.MINIMIZE)
+    
 
-
+m.optimize()
+# print(m.X)
 
 
