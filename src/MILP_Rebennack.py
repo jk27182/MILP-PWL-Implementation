@@ -3,13 +3,17 @@ import itertools
 import gurobipy as gp
 import numpy as np
 
+
+
 file = "data/MpStorage50.txt"
 data = np.genfromtxt(file, delimiter="\t")
 
-data_points = data.shape[0]
+n_data_points = data.shape[0]
 n_breakpoints = 5
+# Distance metric
+q = 1
 
-cross_prod = itertools.product(range(data_points), repeat=2)
+cross_prod = itertools.product(range(n_data_points), repeat=2)
 c_max = -float("inf")
 c_min = float("inf")
 for i, j in cross_prod:
@@ -31,5 +35,43 @@ M_a_arr = np.c_[
     d_c - d_max,
 ]
 M_a = np.max(M_a_arr, axis=1)
-# Distance metric
-q = 1
+
+m = gp.Model("MILP_Rebennack")
+c = m.addMvar(n_breakpoints - 1, name="c", lb=c_min, ub=c_max)
+d = m.addMVar(n_breakpoints - 1, name="d", lb=d_min, ub=d_max)
+gamma = np.zeros(n_breakpoints - 2, name="gamma", vtype=gp.GRB.BINARY)
+delta = m.addMVar(
+    (n_data_points, n_breakpoints - 1),
+    vtype=gp.GRB.BINARY,
+    name="delta",
+)
+delta_plus = m.addMVar(
+    (n_data_points - 1, n_breakpoints - 2),
+    lb=0,
+    ub=1,
+    name="delta_plus",
+)
+delta_minus = m.addMVar(
+    (n_data_points - 1, n_breakpoints - 2),
+    lb=0,
+    ub=1,
+    name="delta_minus",
+)
+epsilon = m.addMVar(
+    n_data_points,
+    lb=0,
+    name="epsilon",
+)
+m.addConstr(
+    gp.quicksum(
+        delta[i,b]
+        for i in range(n_data_points) 
+        for b in range(n_breakpoints - 1)
+    ) == 1
+)
+
+
+
+
+
+
