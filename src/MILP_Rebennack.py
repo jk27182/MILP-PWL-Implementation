@@ -13,7 +13,7 @@ linear_segments = 4
 n_breakpoints = linear_segments + 1
 # Distance metric
 # 0=Feasibility, 1=LInf, 2=L1, 3=L2
-objective = 1 
+objective = 2 
 
 cross_prod = itertools.product(range(n_data_points), repeat=2)
 c_max = -float("inf")
