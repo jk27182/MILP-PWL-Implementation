@@ -13,7 +13,7 @@ linear_segments = 4
 n_breakpoints = linear_segments + 1
 # Distance metric
 # 0=Feasibility, 1=LInf, 2=L1, 3=L2
-objective = 2 
+objective = "L2" 
 
 cross_prod = itertools.product(range(n_data_points), repeat=2)
 c_max = -float("inf")
@@ -91,17 +91,26 @@ if objective == 0:
 if objective == 1:
     for i in range(n_data_points):
         for b in range(n_breakpoints - 1):
-            m.addConstr(data[i,1] - (c[b]*data[i,0] + d[b]) <= epsilon[0] + M_a[i]*(1 - delta[i,b]))
-            m.addConstr(c[b]*data[i,0] + d[b] - data[i,1] <= epsilon[0] + M_a[i]*(1 - delta[i,b]))
-    m.setObjective(epsilon[0], gp.GRB.MINIMIZE)
+            m.addConstr(data[i,1] - (c[b]*data[i,0] + d[b]) <= epsilon[i] + M_a[i]*(1 - delta[i,b]))
+            m.addConstr(c[b]*data[i,0] + d[b] - data[i,1] <= epsilon[i] + M_a[i]*(1 - delta[i,b]))
+    m.setObjective(gp.norm(), gp.GRB.MINIMIZE)
     
-if objective == 2:
+if objective == "L1":
     for i in range(n_data_points):
         for b in range(n_breakpoints - 1):
             m.addConstr(data[i,1] - (c[b]*data[i,0] + d[b]) <= epsilon[i] + M_a[i]*(1 - delta[i,b]))
             m.addConstr(c[b]*data[i,0] + d[b] - data[i,1] <= epsilon[i] + M_a[i]*(1 - delta[i,b]))
 
     m.setObjective(gp.quicksum(epsilon[i] for i in range(n_data_points)), gp.GRB.MINIMIZE)
+
+if objective == "L2":
+    for i in range(n_data_points):
+        for b in range(n_breakpoints - 1):
+            m.addConstr(data[i,1] - (c[b]*data[i,0] + d[b]) <= epsilon[i] + M_a[i]*(1 - delta[i,b]))
+            m.addConstr(c[b]*data[i,0] + d[b] - data[i,1] <= epsilon[i] + M_a[i]*(1 - delta[i,b]))
+
+    m.setObjective(gp.quicksum(epsilon[i]**2 for i in range(n_data_points)), gp.GRB.MINIMIZE)
+    
 
 m.optimize()
 # print(m.X)
