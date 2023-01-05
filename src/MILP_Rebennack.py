@@ -13,7 +13,7 @@ linear_segments = 4
 n_breakpoints = linear_segments + 1
 # Distance metric
 # 0=Feasibility, 1=LInf, 2=L1, 3=L2
-objective = "L2" 
+objective = "feasibility" 
 
 cross_prod = itertools.product(range(n_data_points), repeat=2)
 c_max = -float("inf")
@@ -85,7 +85,7 @@ for i in range(n_data_points - 1):
         m.addConstr(d[b+1] - d[b] <= data[i, 0]*(c[b] - c[b+1]) + M_2[i]*(1 - delta_minus[i, b]))
         m.addConstr(d[b+1] - d[b] >= data[i+1, 0]*(c[b] - c[b+1]) - M_2[i+1]*(1 - delta_minus[i, b]))
 
-if objective == 0:
+if objective == "feasibility":
     m.setObjective(1)
 
 if objective == 1:
