@@ -9,9 +9,8 @@ file = "data/MpStorage50.txt"
 data = np.genfromtxt(file, delimiter="\t")
 
 n_data_points = data.shape[0]
-n_breakpoints = 5
-# Distance metric
-q = 1
+linear_segments = 4
+n_breakpoints = linear_segments + 1
 # Distance metric
 # 0=Feasibility, 1=LInf, 2=L1, 3=L2
 objective = 1 
@@ -66,16 +65,16 @@ epsilon = m.addMVar(
     lb=0,
     name="epsilon",
 )
-m.addConstr(
-    gp.quicksum(
-        delta[i,b]
-        for i in range(n_data_points)
-        for b in range(n_breakpoints - 1)
-    ) == 1
-)
+for i in range(n_data_points):
+    m.addConstr(
+        gp.quicksum(
+            delta[i,b]
+            for b in range(n_breakpoints - 1)
+        ) == 1
+    )
 for i in range(n_data_points - 1):
     m.addConstr(delta[i+1, 0] <= delta[i, 0])
-    m.addConstr(delta[i+1, n_breakpoints - 2] <= delta[i, n_breakpoints - 2])
+    m.addConstr(delta[i, n_breakpoints - 2] <= delta[i+1, n_breakpoints - 2])
     for b in range(n_breakpoints - 2):
         m.addConstr(delta[i+1, b+1] <= delta[i, b] + delta[i, b+1])
         
@@ -96,8 +95,23 @@ if objective == 1:
             m.addConstr(c[b]*data[i,0] + d[b] - data[i,1] <= epsilon[0] + M_a[i]*(1 - delta[i,b]))
     m.setObjective(epsilon[0], gp.GRB.MINIMIZE)
     
+if objective == 2:
+    for i in range(n_data_points):
+        for b in range(n_breakpoints - 1):
+            m.addConstr(data[i,1] - (c[b]*data[i,0] + d[b]) <= epsilon[i] + M_a[i]*(1 - delta[i,b]))
+            m.addConstr(c[b]*data[i,0] + d[b] - data[i,1] <= epsilon[i] + M_a[i]*(1 - delta[i,b]))
+
+    m.setObjective(gp.quicksum(epsilon[i] for i in range(n_data_points)), gp.GRB.MINIMIZE)
 
 m.optimize()
 # print(m.X)
+
+print("Affine functions")
+affine_function_str = f"""{c[0].X} *X + {d[0].X}  ({data[0,0]}  <= X <= {(d[1].X - d[0].X)/ (c[0].X - c[1].X)})\n"""
+for b in range(1, n_breakpoints - 2):
+   affine_function_str +=  f"{c[b].X} *X + {d[b].X}  ({(d[b].X - d[b-1].X)/(c[b-1].X - c[b].X)}  <= X <= {(d[b+1].X - d[b].X)/ (c[b].X - c[b+1].X)})\n"
+
+affine_function_str += f"{c[n_breakpoints - 2].X} *X + {d[n_breakpoints - 2].X}  ( ({(d[n_breakpoints - 2].X - d[n_breakpoints - 3].X) / (c[n_breakpoints - 3].X - c[n_breakpoints - 2].X)})  <= X <=  {data[n_data_points - 1, 0]})\n"
+print(affine_function_str)
 
 
