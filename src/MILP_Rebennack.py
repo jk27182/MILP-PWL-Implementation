@@ -5,11 +5,11 @@ import gurobipy as gp
 import numpy as np
 
 
-file = "data/MpStorage50.txt"
+# file = "data/MpStorage50.txt"
+file = "data/eigene_data.txt"
 data = np.genfromtxt(file, delimiter="\t")
-
 n_data_points = data.shape[0]
-linear_segments = 4
+linear_segments = 3
 n_breakpoints = linear_segments + 1
 # Choose distance metric: feasibility, LInf, L1, L2
 # objective = "LInf"
@@ -32,6 +32,7 @@ d_c = np.c_[
 ]
 d_max = np.max(d_c)
 d_min = np.min(d_c)
+
 M_2 = d_max - d_min - data[:, 0] * (c_min - c_max)
 M_a_arr = np.c_[
     d_c - d_min,
@@ -68,7 +69,8 @@ epsilon = m.addMVar(
     name="epsilon",
 )
 for i in range(n_data_points):
-    m.addConstr(gp.quicksum(delta[i, b] for b in range(n_breakpoints - 1)) == 1)
+    m.addConstr(gp.quicksum(delta[i, :]) == 1)
+
 for i in range(n_data_points - 1):
     m.addConstr(delta[i + 1, 0] <= delta[i, 0])
     m.addConstr(delta[i, n_breakpoints - 2] <= delta[i + 1, n_breakpoints - 2])
@@ -104,17 +106,18 @@ if objective == "feasibility":
 
 
 if objective == "LInf":
+    tau = m.addVar(name="tau", lb=0)
     for i in range(n_data_points):
         for b in range(n_breakpoints - 1):
             m.addConstr(
                 data[i, 1] - (c[b] * data[i, 0] + d[b])
-                <= epsilon[0] + M_a[i] * (1 - delta[i, b])
+                <= tau + M_a[i] * (1 - delta[i, b])
             )
             m.addConstr(
-                c[b] * data[i, 0] + d[b] - data[i, 1]
-                <= epsilon[0] + M_a[i] * (1 - delta[i, b])
+                (c[b] * data[i, 0] + d[b]) - data[i, 1]
+                <= tau + M_a[i] * (1 - delta[i, b])
             )
-    m.setObjective(epsilon[0], gp.GRB.MINIMIZE)
+    m.setObjective(tau, gp.GRB.MINIMIZE)
 
 
 if objective == "L1":
@@ -175,7 +178,4 @@ def plot_data(data, func=None):
     plt.show()
 
 
-# if __name__ == "__main__":
-#     # c, d = fit_pwl(data, n_data_points, n_breakpoints, objective)
-#     # print_solution(data, n_data_points, n_breakpoints, c, d)
-#     plot_data(data, np.abs)
+
