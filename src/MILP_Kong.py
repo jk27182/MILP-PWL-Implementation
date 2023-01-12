@@ -74,7 +74,7 @@ if distance_metric == "L1":
             )
 else:
     for i in range(n_data_points):
-        for breakpoint in range(n_breakpoints -1):
+        for breakpoint in range(n_breakpoints - 1):
             m.addConstr(
                 E[i] >= (data[i, 0] * A[breakpoint] + B[breakpoint]) - data[i, 1] - M_a[i] * (1 - Z[i, breakpoint])
             )
@@ -98,6 +98,13 @@ for i in range(n_data_points - 1):
     for breakpoint in range(n_breakpoints - 2):
         m.addConstr(gp.quicksum(ZF[:i+1, breakpoint+1]) <= gp.quicksum(ZF[:i+1, breakpoint]))
         m.addConstr(gp.quicksum(ZL[:i+1, breakpoint+1]) <= gp.quicksum(ZL[:i+1, breakpoint]))
+
+        # for j in range(i+1):
+        # partsum_ZFa           
+        # partsum_ZFb
+        # partsum_ZLa
+        # partsum_ZLb
+
         
 
 for i in range(n_data_points):
