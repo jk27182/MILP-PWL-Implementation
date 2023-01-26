@@ -40,7 +40,7 @@ M_a = np.max(M_a_arr, axis=1)
 
 m = gp.Model("MILP_Kong")
 
-Y = m.addMVar((n_data_points, n_breakpoints - 1), name="Y", b=-float("inf"))
+Y = m.addMVar((n_data_points, n_breakpoints - 1), name="Y", lb=-float("inf"))
 A = m.addMVar(n_breakpoints - 1, name="A", lb=c_min, ub=c_max)
 B = m.addMVar(n_breakpoints - 1, name="B", lb=d_min, ub=d_max)
 E = m.addMVar(n_data_points, name="E", lb=0)
