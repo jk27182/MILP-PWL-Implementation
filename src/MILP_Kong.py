@@ -43,8 +43,8 @@ m = gp.Model("MILP_Kong")
 Y = m.addMVar((n_data_points, n_breakpoints - 1), name="Y", lb=-float("inf"))
 A = m.addMVar(n_breakpoints - 1, name="A", lb=c_min, ub=c_max)
 B = m.addMVar(n_breakpoints - 1, name="B", lb=d_min, ub=d_max)
-E = m.addMVar(n_data_points, name="E", lb=0)
-E1 = m.addVar(name="E1", lb=0)
+E = m.addMVar(n_data_points, name="E", lb=0, ub=float("inf"))
+E1 = m.addVar(name="E1", lb=0, ub=float("inf"))
 
 P_plus = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="P_plus", lb=0)
 P_minus = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="P_minus", lb=0)
@@ -52,12 +52,12 @@ P_minus = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="P_minus", lb=0
 Q_plus = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="Q_plus", lb=0)
 Q_minus = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="Q_minus", lb=0)
 
-U = m.addMVar((n_data_points + 1, n_breakpoints - 2), name="U")
-V = m.addMVar((n_data_points + 1, n_breakpoints - 2), name="V")
+U = m.addMVar((n_data_points + 1, n_breakpoints - 2), name="U", vtype=gp.GRB.BINARY)
+V = m.addMVar((n_data_points + 1, n_breakpoints - 2), name="V", vtype=gp.GRB.BINARY)
 
-Z = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="Z")
-ZF = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="ZF")
-ZL = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="ZL")
+Z = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="Z", vtype=gp.GRB.BINARY)
+ZF = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="ZF", vtype=gp.GRB.BINARY)
+ZL = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="ZL", vtype=gp.GRB.BINARY)
 
 # Sum over bZ
 for i in range(n_data_points):
