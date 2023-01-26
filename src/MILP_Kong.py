@@ -60,6 +60,7 @@ ZF = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="ZF", vtype=gp.GRB.B
 ZL = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="ZL", vtype=gp.GRB.BINARY)
 
 # Sum over bZ
+# C++ code also omits the last datapoint
 for i in range(n_data_points):
     m.addConstr(gp.quicksum(Z[i, :]) == 1)
 
@@ -107,7 +108,8 @@ for breakpoint in range(n_breakpoints - 1):
     m.addConstr(gp.quicksum(ZF[:, breakpoint]) == 1)
 
 # partsums
-for i in range(n_data_points - 1):
+# pretty sure it should go to n_data_points and not n_data_points_1
+for i in range(n_data_points):
     for breakpoint in range(n_breakpoints - 2):
         m.addConstr(
             gp.quicksum(ZF[: i + 1, breakpoint + 1])
