@@ -6,10 +6,10 @@ import numpy as np
 
 
 # file = "data/MpStorage50.txt"
-file = "data/eigene_data.txt"
+file = "data/MpStorage50.txt"
 data = np.genfromtxt(file, delimiter="\t")
 n_data_points = data.shape[0]
-linear_segments = 3
+linear_segments = 2
 n_breakpoints = linear_segments + 1
 # Choose distance metric: feasibility, LInf, L1, L2
 # objective = "LInf"
@@ -176,6 +176,3 @@ def plot_data(data, func=None):
     if func is not None:
         ax.plot(data[:, 0], func(data[:, 1]), color="r")
     plt.show()
-
-
-
