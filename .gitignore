@@ -5,3 +5,6 @@
 MILP_Rebennack
 MILP_Kong
 data/
+.DS_Store 
+.swp 
+*.png
