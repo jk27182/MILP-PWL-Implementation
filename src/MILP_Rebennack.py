@@ -4,17 +4,15 @@ import sys
 import gurobipy as gp
 import numpy as np
 
-
 # file = "data/MpStorage50.txt"
 file = "data/MpStorage50.txt"
 data = np.genfromtxt(file, delimiter="\t")
 n_data_points = data.shape[0]
-linear_segments = 2
+linear_segments = 3
 n_breakpoints = linear_segments + 1
 # Choose distance metric: feasibility, LInf, L1, L2
 # objective = "LInf"
 objective = sys.argv[1]
-print(objective)
 
 cross_prod = itertools.product(range(n_data_points), repeat=2)
 c_max = -float("inf")
