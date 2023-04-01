@@ -185,11 +185,11 @@ def create_and_optimize(data, linear_segments, objective):
 )
     return df_res
 
-
-data = "data/MpStorage50.txt"
-linear_segments = 3
-objective = sys.argv[1]
-create_and_optimize(data, linear_segments, objective)
+if __name__ == "__main__":
+    data = "data/MpStorage50.txt"
+    linear_segments = 3
+    objective = sys.argv[1]
+    create_and_optimize(data, linear_segments, objective)
 
 # def plot_data(data, func=None):
 #     import matplotlib.pyplot as plt
