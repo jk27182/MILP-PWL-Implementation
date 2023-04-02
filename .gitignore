@@ -1,10 +1,6 @@
 .vscode
-*.out
 .venv
-*.cpp
-MILP_Rebennack
-MILP_Kong
-data/
 .DS_Store 
 .swp 
 *.png
+Output
