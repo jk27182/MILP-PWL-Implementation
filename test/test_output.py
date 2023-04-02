@@ -40,8 +40,8 @@ def test_output_rebennack(data_path, lin_seg, objective):
 @pytest.mark.kong
 @pytest.mark.parametrize("data_path, lin_seg, objective", [
     ("data/MpStorage50.txt", 3, "LInf"), #passes
-    # ("data/MpStorage50.txt", 3, "L1"), #passes 
-    # ("data/MpStorage50.txt", 3, "L2"), #fails, gurobi mit komischem Output
+    ("data/MpStorage50.txt", 3, "L1"), #passes 
+    ("data/MpStorage50.txt", 3, "L2"), #fails, gurobi mit komischem Output
 
 ])
 def test_output_kong(data_path, lin_seg, objective):
