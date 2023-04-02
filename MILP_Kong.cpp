@@ -1,6 +1,7 @@
 // -------------------------------------------------------------- -*- C++ -*-
 
 #include <ilcplex/ilocplex.h>
+#include <stdlib.h>
 ILOSTLBEGIN
 using namespace std;
 
@@ -9,15 +10,24 @@ typedef IloArray<IloNumArray>    NumMatrix;
 typedef IloArray<IloBoolVarArray> BoolVarMatrix;
 typedef IloArray<IloNumExprArray> ArrayMatrix;
 
-std::string filename = "data/MpStorage50.txt";
-const IloInt Breakpoints = 4;
+// std::string filename = "data/MpStorage50.txt";
+// const IloInt Breakpoints = 4;
 
 // 1 = LInf, 2=, 3=.
-IloInt q = 2; //DistanceMetric
+// IloInt q = 2; //DistanceMetric
 
 int
-main()
+main(int argc, char* argv[])
 {
+	char *p;
+	char *p2;
+
+	std::string filename = argv[1]; //"data/MpStorage50.txt";
+	const IloInt LinSeg = strtol(argv[2], &p, 10);
+	IloInt q = strtol(argv[3], &p2, 10);; //Pick Distance Metric. 0=Feasibility, 1=LInf, 2=L1, 3=L2
+
+	const IloInt Breakpoints = LinSeg + 1;
+
 	int i, j;
 	ifstream inFile;
 	inFile.open(filename);

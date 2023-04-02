@@ -14,12 +14,18 @@ typedef IloArray<IloNumVarArray> NumVarMatrix;
 typedef IloArray<IloNumArray>    NumMatrix;
 typedef IloArray<IloBoolVarArray> BoolVarMatrix;
 
-std::string filename = "data/MpStorage50.txt";
-const IloInt LinSeg = 3;
-const IloInt Breakpoints = LinSeg + 1;
-IloInt Objective = 2; //Pick Distance Metric. 0=Feasibility, 1=LInf, 2=L1, 3=L2
 
-int main(){
+int main(int argc, char* argv[]){
+
+	char *p;
+	char *p2;
+
+	std::string filename = argv[1]; //"data/MpStorage50.txt";
+	const IloInt LinSeg = strtol(argv[2], &p, 10);
+	IloInt Objective = strtol(argv[3], &p2, 10);; //Pick Distance Metric. 0=Feasibility, 1=LInf, 2=L1, 3=L2
+
+	const IloInt Breakpoints = LinSeg + 1;
+	//
 	int i, j;
 	ifstream inFile;
 	inFile.open(filename);

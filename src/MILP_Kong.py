@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-def create_and_optimize(file_path, linear_segments, distance_metric):
+def create_and_optimize(file_path, linear_segments, objective):
     n_breakpoints = linear_segments + 1
     data = np.genfromtxt(file_path, delimiter="\t")
     n_data_points = data.shape[0]
@@ -60,7 +60,7 @@ def create_and_optimize(file_path, linear_segments, distance_metric):
     for i in range(n_data_points):
         m.addConstr(gp.quicksum(Z[i, :]) == 1)
 
-    if distance_metric == "LInf":
+    if objective == "LInf":
         for i in range(n_data_points):
             for breakpoint in range(n_breakpoints - 1):
                 m.addConstr(
@@ -151,10 +151,10 @@ def create_and_optimize(file_path, linear_segments, distance_metric):
 
             m.addConstr(U[i, breakpoint] + V[i, breakpoint] == ZL[i, breakpoint])
 
-    if distance_metric == "LInf":
+    if objective == "LInf":
         m.setObjective(E1, gp.GRB.MINIMIZE)
 
-    if distance_metric == "L1":
+    if objective == "L1":
         m.setObjective(gp.quicksum(E), gp.GRB.MINIMIZE)
 
     m.optimize()
