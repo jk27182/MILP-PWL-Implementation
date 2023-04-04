@@ -157,6 +157,9 @@ def create_and_optimize(file_path, linear_segments, objective):
     if objective == "L1":
         m.setObjective(gp.quicksum(E), gp.GRB.MINIMIZE)
 
+    if objective == "L2":
+        m.setObjective(gp.quicksum(E**2), gp.GRB.MINIMIZE)
+
     m.optimize()
 
     print("Affine functions")
