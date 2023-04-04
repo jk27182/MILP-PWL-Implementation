@@ -1,3 +1,4 @@
+import sys
 import itertools
 
 import gurobipy as gp
@@ -197,7 +198,6 @@ def create_and_optimize(file_path, linear_segments, objective):
 # It is assumed that the data for the independet variables ("x") is in the first column
 # and the dependent variable ("y") is in the second column
 if __name__ == "__main__":
-    import sys
     file = "data/MpStorage50.txt"
 
     linear_segments = 3

@@ -39,15 +39,12 @@ def test_output_rebennack(data_path, lin_seg, objective):
 
 @pytest.mark.kong
 @pytest.mark.parametrize("data_path, lin_seg, objective", [
-    ("data/MpStorage50.txt", 3, "LInf"), #passes
-    ("data/MpStorage50.txt", 3, "L1"), #passes 
-    ("data/MpStorage50.txt", 3, "L2"), #fails, gurobi mit komischem Output
+    ("data/MpStorage50.txt", 3, "LInf"), 
+    ("data/MpStorage50.txt", 3, "L1"), 
+    ("data/MpStorage50.txt", 3, "L2"),
 
 ])
 def test_output_kong(data_path, lin_seg, objective):
-    print(data_path)
-    print(lin_seg)
-    print(objective)
     func_info_py = kong.create_and_optimize(
             data_path,
             linear_segments=lin_seg,
