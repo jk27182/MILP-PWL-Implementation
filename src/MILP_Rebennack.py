@@ -5,14 +5,11 @@ import gurobipy as gp
 import numpy as np
 import pandas as pd
 
-# file = "data/MpStorage50.txt"
 
 def create_and_optimize(data, linear_segments, objective):
     n_breakpoints = linear_segments + 1
     data = np.genfromtxt(data, delimiter="\t")
     n_data_points = data.shape[0]
-    # Choose distance metric: feasibility, LInf, L1, L2
-    # objective = "LInf"
 
     cross_prod = itertools.product(range(n_data_points), repeat=2)
     c_max = -float("inf")
@@ -188,17 +185,7 @@ def create_and_optimize(data, linear_segments, objective):
 if __name__ == "__main__":
     data = "data/MpStorage50.txt"
     linear_segments = 3
+    # Choose distance metric: feasibility, LInf, L1, L2
     objective = sys.argv[1]
     create_and_optimize(data, linear_segments, objective)
 
-# def plot_data(data, func=None):
-#     import matplotlib.pyplot as plt
-#
-#     fig, ax = plt.subplots(nrows=1, ncols=1)
-#     ax.scatter(x=data[:, 0], y=data[:, 1])
-#     ax.grid(True, axis="both")
-#     ax.set_xlabel("x")
-#     ax.set_ylabel("y")
-#     if func is not None:
-#         ax.plot(data[:, 0], func(data[:, 1]), color="r")
-#     plt.show()

@@ -10,7 +10,6 @@ def create_and_optimize(file_path, linear_segments, objective):
     n_breakpoints = linear_segments + 1
     data = np.genfromtxt(file_path, delimiter="\t")
     n_data_points = data.shape[0]
-    # Choose distance metric: feasibility, LInf, L1, L2
 
     cross_prod = itertools.product(range(n_data_points), repeat=2)
     c_max = -float("inf")
@@ -57,7 +56,6 @@ def create_and_optimize(file_path, linear_segments, objective):
     ZL = m.addMVar((n_data_points + 1, n_breakpoints - 1), name="ZL", vtype=gp.GRB.BINARY)
 
     # Sum over bZ
-    # C++ code also omits the last datapoint
     for i in range(n_data_points):
         m.addConstr(gp.quicksum(Z[i, :]) == 1)
 
@@ -105,7 +103,6 @@ def create_and_optimize(file_path, linear_segments, objective):
         m.addConstr(gp.quicksum(ZF[:, breakpoint]) == 1)
 
     # partsums
-    # pretty sure it should go to n_data_points and not n_data_points_1
     for i in range(n_data_points):
         for breakpoint in range(n_breakpoints - 2):
             m.addConstr(
@@ -116,13 +113,6 @@ def create_and_optimize(file_path, linear_segments, objective):
                 gp.quicksum(ZL[: i + 1, breakpoint + 1])
                 <= gp.quicksum(ZL[: i + 1, breakpoint])
             )
-
-            # for j in range(i+1):
-            # partsum_ZFa
-            # partsum_ZFb
-            # partsum_ZLa
-            # partsum_ZLb
-
 
     for i in range(n_data_points):
         for breakpoint in range(n_breakpoints - 1):
@@ -201,6 +191,7 @@ if __name__ == "__main__":
     file = "data/MpStorage50.txt"
 
     linear_segments = 3
+    # Choose distance metric: feasibility, LInf, L1, L2
     distance_metric = sys.argv[1]
     df_res = create_and_optimize(file, linear_segments, distance_metric)
     print(df_res)
