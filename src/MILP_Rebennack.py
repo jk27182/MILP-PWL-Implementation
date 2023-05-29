@@ -173,19 +173,45 @@ def create_and_optimize(data, linear_segments, objective):
     uppper_bound.append(data[n_data_points - 1, 0])
 
     df_res = pd.DataFrame(
-    {
-        "c": c_data,
-        "d": d_data,
-        "X_lower_bound": lower_bound,
-        "X_upper_bound": uppper_bound,
-    }
-)
-    return df_res
+        {
+            "c": c_data,
+            "d": d_data,
+            "X_lower_bound": lower_bound,
+            "X_upper_bound": uppper_bound,
+        }
+    ).astype(float)
+
+    def piecewise_func(x):
+        print(x)
+        func = np.piecewise(
+            x,
+            # Use XOR since we want the value where Lower Bound <= x is True and where Upper Bound < x is False,  
+            (df_res['X_lower_bound'] <= x) ^ (df_res['X_upper_bound'] < x), 
+            df_res['c']*x + df_res['d'],
+        )
+
+        return func
+
+    return df_res, piecewise_func
+
 
 if __name__ == "__main__":
     data = "data/MpStorage50.txt"
     linear_segments = 3
     # Choose distance metric: feasibility, LInf, L1, L2
     objective = sys.argv[1]
-    create_and_optimize(data, linear_segments, objective)
+    df_res, piecewise_func = create_and_optimize(data, linear_segments, objective)
 
+    import matplotlib.pyplot as plt
+
+    data = np.genfromtxt(data, delimiter="\t")
+    piecewise_data = []
+    for point in data[:, 0]:
+        res = piecewise_func(point)
+        piecewise_data.append(res)
+
+    fig, ax = plt.subplots()
+    ax.scatter(data[:, 0], data[:, 1], label="Raw data", color='blue')
+    ax.plot(data[:, 0], piecewise_data, label='Fitted PWLF', color="orange")
+    ax.legend()
+    plt.show()

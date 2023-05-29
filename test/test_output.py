@@ -27,8 +27,8 @@ def test_output_rebennack(data_path, lin_seg, objective):
     )
     subprocess.run([f'Output/Rebennack_out', 'data_path', 'lin_seg', f'{__OBJECTICE_MAPPING[objective]}'])
     func_info_cpp = pd.read_csv("res_rebennack_cpp.csv")
-    print(func_info_py.astype(float).values)
-    print(func_info_cpp.astype(float).values)
+    # print(func_info_py.astype(float).values)
+    # print(func_info_cpp.astype(float).values)
     assert np.allclose(
             func_info_py.astype(float).values,
             func_info_cpp.astype(float).values,
